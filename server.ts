@@ -25,13 +25,15 @@ server.tool(
   {},
   async () => {
     const data = await api("/habits");
-    const habits = (data.data || []).map((h: any) => ({
-      id: h.id,
-      name: h.name,
-      area: h.area?.name,
-      goal: h.goal,
-      status: h.status,
-    }));
+    const habits = (data.data || [])
+      .filter((h: any) => !h.is_archived)
+      .map((h: any) => ({
+        id: h.id,
+        name: h.name,
+        area: h.area?.name,
+        goal: h.goal,
+        status: h.status,
+      }));
     return { content: [{ type: "text", text: JSON.stringify(habits, null, 2) }] };
   }
 );
@@ -45,7 +47,9 @@ server.tool(
   async (args) => {
     const date = args.date || new Date().toISOString().split("T")[0];
     const data = await api(`/habits?date=${date}T00:00:00`);
-    const habits = (data.data || []).map((h: any) => ({
+    const habits = (data.data || [])
+      .filter((h: any) => !h.is_archived)
+      .map((h: any) => ({
       name: h.name,
       status: h.status,
       progress: h.progress,
